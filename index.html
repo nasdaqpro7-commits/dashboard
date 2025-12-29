@@ -2,148 +2,142 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard NASDAQ PRO</title>
+<title>Dashboard | Mentoria NasdaqPro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
- --bg:#020617;
+ --bg1:#020617;
+ --bg2:#06153a;
  --card:#050b1a;
  --border:rgba(255,255,255,.08);
  --text:#e5e7eb;
  --muted:#9ca3af;
+ --blue:#6366f1;
  --green:#22c55e;
  --red:#ef4444;
- --yellow:#facc15;
- --accent:#3b82f6;
 }
 
 *{box-sizing:border-box;font-family:Inter,system-ui}
-
 body{
  margin:0;
- background:radial-gradient(circle at top,#0b1f4d,#020617 70%);
+ background:radial-gradient(1200px at top,#0b2a7a,#020617 70%);
  color:var(--text);
+ min-height:100vh;
 }
 
+/* CONTAINER */
 .container{
- max-width:1600px;
+ max-width:1400px;
  margin:auto;
- padding:32px;
+ padding:40px 32px 80px;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 .header{
- margin-bottom:32px;
+ animation:fadeDown .8s ease both;
 }
-
 .logo{
- width:200px;
- margin-bottom:18px;
+ width:190px;
+ display:block;
 }
-
-h1{
- font-size:42px;
- margin:0;
+.title{
+ font-size:44px;
+ font-weight:800;
+ margin:18px 0 6px;
  letter-spacing:2px;
 }
-
 .subtitle{
- margin-top:8px;
  color:var(--muted);
+ font-size:15px;
 }
 
-/* ===== FILTERS (CUSTOM DROPDOWN) ===== */
+/* FILTROS */
 .filters{
  display:flex;
  gap:16px;
- margin-top:28px;
+ margin:36px 0 30px;
  flex-wrap:wrap;
+ animation:fadeUp .8s ease .2s both;
 }
 
+/* DROPDOWN CUSTOM */
 .dropdown{
  position:relative;
- width:220px;
+ width:180px;
 }
-
-.dropdown button{
+.drop-btn{
  width:100%;
- padding:14px 16px;
- background:var(--card);
- color:var(--text);
+ background:linear-gradient(180deg,#050b1a,#020617);
  border:1px solid var(--border);
+ color:#fff;
+ padding:14px 16px;
  border-radius:14px;
- font-size:15px;
- text-align:left;
  cursor:pointer;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
 }
-
-.dropdown button:after{
- content:"▾";
- float:right;
- opacity:.6;
-}
-
-.menu{
+.drop-list{
  position:absolute;
  top:110%;
  left:0;
- width:100%;
- background:var(--card);
+ right:0;
+ background:#050b1a;
  border:1px solid var(--border);
  border-radius:14px;
  overflow:hidden;
- max-height:0;
- opacity:0;
- transition:.25s ease;
+ display:none;
  z-index:10;
 }
-
-.menu.open{
- max-height:220px;
- opacity:1;
-}
-
-.menu div{
+.drop-list div{
  padding:14px 16px;
  cursor:pointer;
 }
-
-.menu div:hover{
- background:rgba(59,130,246,.15);
+.drop-list div:hover{
+ background:rgba(99,102,241,.15);
 }
+.dropdown.active .drop-list{display:block}
 
-/* ===== KPIs ===== */
+/* KPIS */
 .kpis{
  display:grid;
  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
- gap:18px;
- margin-top:32px;
+ gap:20px;
+ animation:fadeUp .8s ease .4s both;
 }
-
 .kpi{
- background:var(--card);
+ background:linear-gradient(180deg,#050b1a,#020617);
  border:1px solid var(--border);
- border-radius:20px;
- padding:22px;
+ border-radius:22px;
+ padding:26px;
 }
-
 .kpi span{
  color:var(--muted);
- font-size:14px;
+ font-size:13px;
+ letter-spacing:1px;
 }
-
 .kpi strong{
  display:block;
- font-size:30px;
  margin-top:10px;
+ font-size:30px;
 }
 
-.green{color:var(--green)}
-.red{color:var(--red)}
-.yellow{color:var(--yellow)}
+/* ANIMAÇÕES */
+@keyframes fadeDown{
+ from{opacity:0;transform:translateY(-20px)}
+ to{opacity:1;transform:none}
+}
+@keyframes fadeUp{
+ from{opacity:0;transform:translateY(20px)}
+ to{opacity:1;transform:none}
+}
 
+/* MOBILE */
+@media(max-width:600px){
+ .title{font-size:34px}
+ .logo{width:150px}
+}
 </style>
 </head>
 
@@ -151,76 +145,67 @@ h1{
 <div class="container">
 
 <header class="header">
- <img src="logo.png" class="logo">
- <h1>DASHBOARD</h1>
- <div class="subtitle" id="subtitle">2025 • Dezembro • Semana 1</div>
-
- <div class="filters">
-  <div class="dropdown" data-type="ano">
-   <button>2025</button>
-   <div class="menu"></div>
-  </div>
-
-  <div class="dropdown" data-type="mes">
-   <button>Dezembro</button>
-   <div class="menu"></div>
-  </div>
-
-  <div class="dropdown" data-type="semana">
-   <button>Semana 1</button>
-   <div class="menu"></div>
-  </div>
- </div>
+ <img src="logo.png" class="logo" alt="Mentoria NasdaqPro">
+ <div class="title">DASHBOARD</div>
+ <div class="subtitle" id="subtitulo">2025 • Dezembro • Semana 1</div>
 </header>
 
-<section class="kpis">
+<div class="filters">
+ <div class="dropdown">
+  <div class="drop-btn">2025 ▾</div>
+  <div class="drop-list">
+   <div>2024</div>
+   <div>2025</div>
+  </div>
+ </div>
+
+ <div class="dropdown">
+  <div class="drop-btn">Dezembro ▾</div>
+  <div class="drop-list">
+   <div>Janeiro</div>
+   <div>Fevereiro</div>
+   <div>Dezembro</div>
+  </div>
+ </div>
+
+ <div class="dropdown">
+  <div class="drop-btn">Semana 1 ▾</div>
+  <div class="drop-list">
+   <div>Semana 1</div>
+   <div>Semana 2</div>
+   <div>Semana 3</div>
+  </div>
+ </div>
+</div>
+
+<div class="kpis">
  <div class="kpi"><span>TRADES</span><strong>11</strong></div>
  <div class="kpi"><span>PONTOS</span><strong>228</strong></div>
- <div class="kpi"><span>GAINS</span><strong class="green">7</strong></div>
- <div class="kpi"><span>STOPS</span><strong class="red">3</strong></div>
-</section>
+ <div class="kpi"><span>GAINS</span><strong style="color:var(--green)">7</strong></div>
+ <div class="kpi"><span>STOPS</span><strong style="color:var(--red)">3</strong></div>
+</div>
 
 </div>
 
 <script>
-document.querySelectorAll(".dropdown").forEach(dd=>{
- const btn=dd.querySelector("button");
- const menu=dd.querySelector(".menu");
-
- const options={
-  ano:["2024","2025"],
-  mes:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
-  semana:["Semana 1","Semana 2","Semana 3","Semana 4","Semana 5"]
- }[dd.dataset.type];
-
- menu.innerHTML=options.map(o=>`<div>${o}</div>`).join("");
-
+document.querySelectorAll(".dropdown").forEach(d=>{
+ const btn=d.querySelector(".drop-btn");
  btn.onclick=()=>{
-  document.querySelectorAll(".menu").forEach(m=>m.classList.remove("open"));
-  menu.classList.toggle("open");
+  document.querySelectorAll(".dropdown").forEach(o=>o!==d&&o.classList.remove("active"));
+  d.classList.toggle("active");
  };
-
- menu.querySelectorAll("div").forEach(opt=>{
+ d.querySelectorAll(".drop-list div").forEach(opt=>{
   opt.onclick=()=>{
-   btn.textContent=opt.textContent;
-   menu.classList.remove("open");
-   atualizarSubtitle();
+   btn.innerHTML=opt.textContent+" ▾";
+   d.classList.remove("active");
   };
  });
 });
-
 document.addEventListener("click",e=>{
- if(!e.target.closest(".dropdown")){
-  document.querySelectorAll(".menu").forEach(m=>m.classList.remove("open"));
- }
+ if(!e.target.closest(".dropdown"))
+  document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("active"));
 });
-
-function atualizarSubtitle(){
- const anos=document.querySelector('[data-type="ano"] button').textContent;
- const mes=document.querySelector('[data-type="mes"] button').textContent;
- const semana=document.querySelector('[data-type="semana"] button').textContent;
- subtitle.textContent=`${anos} • ${mes} • ${semana}`;
-}
 </script>
+
 </body>
 </html>
