@@ -41,21 +41,21 @@ body{
  display:flex;
  flex-direction:column;
  align-items:flex-start;
- gap:6px;
- margin-bottom:24px;
+ margin-bottom:32px;
 }
 
 .header img{
- height:48px;
+ height:64px;            /* LOGO MAIOR */
  max-width:100%;
 }
 
 .dashboard-title{
- font-size:14px;
- letter-spacing:2px;
- font-weight:700;
+ margin-top:12px;        /* MAIS ABAIXO DA IMAGEM */
+ font-size:18px;         /* TEXTO MAIOR */
+ letter-spacing:3px;
+ font-weight:800;
  color:var(--blue);
- opacity:.9;
+ opacity:.95;
 }
 
 /* FILTROS */
@@ -254,13 +254,7 @@ tr.total{
 
 <script>
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbyybCny81vfVXQHmtlkKEOHHJ6xJ_pKSG_4ndkK0tH-YocrFeWY7qL41TS1IfvRQjLSbLIILV56OV/pub?output=csv";
-
-const nomesMeses={
- "01":"Janeiro","02":"Fevereiro","03":"Março","04":"Abril",
- "05":"Maio","06":"Junho","07":"Julho","08":"Agosto",
- "09":"Setembro","10":"Outubro","11":"Novembro","12":"Dezembro"
-};
-
+const nomesMeses={"01":"Janeiro","02":"Fevereiro","03":"Março","04":"Abril","05":"Maio","06":"Junho","07":"Julho","08":"Agosto","09":"Setembro","10":"Outubro","11":"Novembro","12":"Dezembro"};
 let data=[],chartLinha,chartBar;
 
 async function loadCSV(){
@@ -270,21 +264,14 @@ async function loadCSV(){
 }
 
 function parseCSV(t){
- const rows=t.trim().split(/\r?\n/);
- rows.shift();
+ const rows=t.trim().split(/\r?\n/); rows.shift();
  data=rows.map(r=>{
   const c=r.split(",");
   return{
-   dia:c[0],
-   semana:c[1],
-   ativo:c[2],
-   ano:c[0].substring(6,10),
-   mes:c[0].substring(3,5),
-   pontos:+c[3]||0,
-   trades:+c[4]||0,
-   gain:+c[5]||0,
-   stop:+c[6]||0,
-   zero:+c[7]||0
+   dia:c[0], semana:c[1], ativo:c[2],
+   ano:c[0].substring(6,10), mes:c[0].substring(3,5),
+   pontos:+c[3]||0, trades:+c[4]||0,
+   gain:+c[5]||0, stop:+c[6]||0, zero:+c[7]||0
   }
  });
  initFiltros();
@@ -299,8 +286,7 @@ function initFiltros(){
 }
 
 function initMeses(){
- const hoje=new Date();
- const mesAtual=String(hoje.getMonth()+1).padStart(2,"0");
+ const mesAtual=String(new Date().getMonth()+1).padStart(2,"0");
  const meses=[...new Set(data.filter(d=>d.ano==filtroAno.value).map(d=>d.mes))];
  filtroMes.innerHTML=`<option value="ALL">Todos os meses</option>`+
  meses.map(m=>`<option value="${m}">${nomesMeses[m]}</option>`).join("");
@@ -331,17 +317,14 @@ function atualizar(){
   (filtroMes.value==="ALL"||d.mes==filtroMes.value) &&
   (filtroSemana.value==="ALL"||d.semana==filtroSemana.value)
  );
- renderKPIs(f);renderTabela(f);renderGraficos(f);
+ renderKPIs(f); renderTabela(f); renderGraficos(f);
 }
 
 function renderKPIs(f){
  let t={trades:0,pontos:0,gain:0,stop:0,zero:0};
  f.forEach(d=>{
-  t.trades+=d.trades;
-  t.pontos+=d.pontos;
-  t.gain+=d.gain;
-  t.stop+=d.stop;
-  t.zero+=d.zero;
+  t.trades+=d.trades; t.pontos+=d.pontos;
+  t.gain+=d.gain; t.stop+=d.stop; t.zero+=d.zero;
  });
  const ops=t.gain+t.stop;
  kTrades.textContent=t.trades;
@@ -356,11 +339,8 @@ function renderTabela(f){
  tbody.innerHTML="";
  let tot={pontos:0,trades:0,gain:0,stop:0,zero:0};
  f.forEach(d=>{
-  tot.pontos+=d.pontos;
-  tot.trades+=d.trades;
-  tot.gain+=d.gain;
-  tot.stop+=d.stop;
-  tot.zero+=d.zero;
+  tot.pontos+=d.pontos; tot.trades+=d.trades;
+  tot.gain+=d.gain; tot.stop+=d.stop; tot.zero+=d.zero;
   tbody.innerHTML+=`
   <tr>
    <td>${d.dia}</td>
@@ -386,64 +366,30 @@ function renderTabela(f){
 }
 
 function renderGraficos(f){
- let acc=0;
- const labels=[],saldo=[],diario=[];
- f.forEach(d=>{
-  acc+=d.pontos;
-  labels.push(d.dia);
-  saldo.push(acc);
-  diario.push(d.pontos);
- });
+ let acc=0; const labels=[],saldo=[],diario=[];
+ f.forEach(d=>{ acc+=d.pontos; labels.push(d.dia); saldo.push(acc); diario.push(d.pontos); });
 
  if(chartLinha)chartLinha.destroy();
  if(chartBar)chartBar.destroy();
 
  chartLinha=new Chart(chartLinhaEl,{
   type:"line",
-  data:{labels,datasets:[{
-   data:saldo,
-   borderColor:"#22c55e",
-   tension:.35,
-   fill:true,
-   backgroundColor:"rgba(34,197,94,.18)"
-  }]},
-  options:{
-   responsive:true,
-   maintainAspectRatio:false,
-   plugins:{
-    legend:{display:false},
-    tooltip:{
-     callbacks:{
-      beforeLabel:(ctx)=>`Pontos do dia: ${diario[ctx.dataIndex]}`,
-      label:(ctx)=>`Acumulado: ${ctx.parsed.y}`
-     }
-    }
-   }
-  }
+  data:{labels,datasets:[{data:saldo,borderColor:"#22c55e",tension:.35,fill:true,backgroundColor:"rgba(34,197,94,.18)"}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
  });
 
  chartBar=new Chart(chartBarEl,{
   type:"bar",
   data:{labels:["Gain","Stop","0x0"],datasets:[{
-   data:[
-    f.reduce((a,b)=>a+b.gain,0),
-    f.reduce((a,b)=>a+b.stop,0),
-    f.reduce((a,b)=>a+b.zero,0)
-   ],
-   backgroundColor:["#22c55e","#ef4444","#facc15"],
-   borderRadius:12
+   data:[f.reduce((a,b)=>a+b.gain,0),f.reduce((a,b)=>a+b.stop,0),f.reduce((a,b)=>a+b.zero,0)],
+   backgroundColor:["#22c55e","#ef4444","#facc15"],borderRadius:12
   }]},
-  options:{
-   responsive:true,
-   maintainAspectRatio:false,
-   plugins:{legend:{display:false}}
-  }
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
  });
 }
 
 const chartLinhaEl=document.getElementById("chartLinha");
 const chartBarEl=document.getElementById("chartBar");
-
 loadCSV();
 </script>
 </body>
