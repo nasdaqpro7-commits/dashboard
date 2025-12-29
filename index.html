@@ -1,224 +1,226 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dashboard - NasdaqPro</title>
+<meta charset="UTF-8">
+<title>Dashboard NASDAQ PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-  --bg: #050b1a;
-  --card: #0b1530;
-  --accent: #4f6cff;
-  --text: #ffffff;
-  --muted: #9aa4c7;
+:root{
+ --bg:#020617;
+ --card:#050b1a;
+ --border:rgba(255,255,255,.08);
+ --text:#e5e7eb;
+ --muted:#9ca3af;
+ --green:#22c55e;
+ --red:#ef4444;
+ --yellow:#facc15;
+ --accent:#3b82f6;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", system-ui, sans-serif;
+*{box-sizing:border-box;font-family:Inter,system-ui}
+
+body{
+ margin:0;
+ background:radial-gradient(circle at top,#0b1f4d,#020617 70%);
+ color:var(--text);
 }
 
-body {
-  background: radial-gradient(circle at top, #0b1f4d, var(--bg));
-  color: var(--text);
-  min-height: 100vh;
+.container{
+ max-width:1600px;
+ margin:auto;
+ padding:32px;
 }
 
-/* ================= HEADER ================= */
-
-header {
-  padding: 32px 40px 10px;
-  animation: fadeDown 0.9s ease forwards;
+/* ===== HEADER ===== */
+.header{
+ margin-bottom:32px;
 }
 
-.logo-area {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.logo{
+ width:200px;
+ margin-bottom:18px;
 }
 
-.logo-area img {
-  width: 220px;
-  margin-bottom: 14px;
+h1{
+ font-size:42px;
+ margin:0;
+ letter-spacing:2px;
 }
 
-.logo-area h1 {
-  font-size: 34px;
-  letter-spacing: 3px;
-  font-weight: 700;
+.subtitle{
+ margin-top:8px;
+ color:var(--muted);
 }
 
-.logo-area h2 {
-  margin-top: 10px;
-  font-size: 16px;
-  color: var(--muted);
-  font-weight: 400;
-  transition: all 0.3s ease;
+/* ===== FILTERS (CUSTOM DROPDOWN) ===== */
+.filters{
+ display:flex;
+ gap:16px;
+ margin-top:28px;
+ flex-wrap:wrap;
 }
 
-/* ================= FILTERS ================= */
-
-.filters {
-  display: flex;
-  gap: 14px;
-  padding: 25px 40px;
-  animation: fadeUp 1s ease forwards;
+.dropdown{
+ position:relative;
+ width:220px;
 }
 
-select {
-  background: linear-gradient(145deg, #060d22, #020714);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #1c2a5a;
-  min-width: 140px;
-  font-size: 14px;
+.dropdown button{
+ width:100%;
+ padding:14px 16px;
+ background:var(--card);
+ color:var(--text);
+ border:1px solid var(--border);
+ border-radius:14px;
+ font-size:15px;
+ text-align:left;
+ cursor:pointer;
 }
 
-/* ================= KPIs ================= */
-
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 18px;
-  padding: 0 40px;
+.dropdown button:after{
+ content:"▾";
+ float:right;
+ opacity:.6;
 }
 
-.kpi {
-  background: linear-gradient(145deg, #0b1530, #050b1a);
-  border-radius: 18px;
-  padding: 22px;
-  animation: fadeUp 1.1s ease forwards;
+.menu{
+ position:absolute;
+ top:110%;
+ left:0;
+ width:100%;
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:14px;
+ overflow:hidden;
+ max-height:0;
+ opacity:0;
+ transition:.25s ease;
+ z-index:10;
 }
 
-.kpi span {
-  color: var(--muted);
-  font-size: 13px;
+.menu.open{
+ max-height:220px;
+ opacity:1;
 }
 
-.kpi strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 26px;
+.menu div{
+ padding:14px 16px;
+ cursor:pointer;
 }
 
-.green { color: #22c55e; }
-.red { color: #ef4444; }
-
-/* ================= ANIMAÇÕES ================= */
-
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
+.menu div:hover{
+ background:rgba(59,130,246,.15);
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(25px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ===== KPIs ===== */
+.kpis{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:18px;
+ margin-top:32px;
 }
 
-/* ================= RESPONSIVO ================= */
-
-@media (max-width: 768px) {
-  header { padding: 24px; }
-  .filters { padding: 20px; flex-wrap: wrap; }
-  .kpis { padding: 0 20px; }
-  .logo-area img { width: 180px; }
-  .logo-area h1 { font-size: 28px; }
+.kpi{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:20px;
+ padding:22px;
 }
+
+.kpi span{
+ color:var(--muted);
+ font-size:14px;
+}
+
+.kpi strong{
+ display:block;
+ font-size:30px;
+ margin-top:10px;
+}
+
+.green{color:var(--green)}
+.red{color:var(--red)}
+.yellow{color:var(--yellow)}
+
 </style>
 </head>
 
 <body>
+<div class="container">
 
-<!-- ================= HEADER ================= -->
-<header>
-  <div class="logo-area">
-    <img src="logo.png" alt="Mentoria NasdaqPro">
-    <h1>DASHBOARD</h1>
-    <h2 id="subtitle">Visão Geral</h2>
+<header class="header">
+ <img src="logo.png" class="logo">
+ <h1>DASHBOARD</h1>
+ <div class="subtitle" id="subtitle">2025 • Dezembro • Semana 1</div>
+
+ <div class="filters">
+  <div class="dropdown" data-type="ano">
+   <button>2025</button>
+   <div class="menu"></div>
   </div>
+
+  <div class="dropdown" data-type="mes">
+   <button>Dezembro</button>
+   <div class="menu"></div>
+  </div>
+
+  <div class="dropdown" data-type="semana">
+   <button>Semana 1</button>
+   <div class="menu"></div>
+  </div>
+ </div>
 </header>
 
-<!-- ================= FILTERS ================= -->
-<div class="filters">
-  <select id="year">
-    <option>2025</option>
-    <option>2024</option>
-  </select>
-
-  <select id="month">
-    <option>Janeiro</option>
-    <option>Fevereiro</option>
-    <option>Março</option>
-    <option>Abril</option>
-    <option>Maio</option>
-    <option>Junho</option>
-    <option>Julho</option>
-    <option>Agosto</option>
-    <option>Setembro</option>
-    <option>Outubro</option>
-    <option selected>Dezembro</option>
-  </select>
-
-  <select id="week">
-    <option>Visão Geral</option>
-    <option selected>Semana 1</option>
-    <option>Semana 2</option>
-    <option>Semana 3</option>
-    <option>Semana 4</option>
-  </select>
-</div>
-
-<!-- ================= KPIs ================= -->
 <section class="kpis">
-  <div class="kpi">
-    <span>TRADES</span>
-    <strong>11</strong>
-  </div>
-
-  <div class="kpi">
-    <span>PONTOS</span>
-    <strong>228</strong>
-  </div>
-
-  <div class="kpi">
-    <span>GAINS</span>
-    <strong class="green">7</strong>
-  </div>
-
-  <div class="kpi">
-    <span>STOPS</span>
-    <strong class="red">3</strong>
-  </div>
+ <div class="kpi"><span>TRADES</span><strong>11</strong></div>
+ <div class="kpi"><span>PONTOS</span><strong>228</strong></div>
+ <div class="kpi"><span>GAINS</span><strong class="green">7</strong></div>
+ <div class="kpi"><span>STOPS</span><strong class="red">3</strong></div>
 </section>
 
+</div>
+
 <script>
-function atualizarSubtitulo() {
-  const ano = document.getElementById("year").value;
-  const mes = document.getElementById("month").value;
-  const semana = document.getElementById("week").value;
+document.querySelectorAll(".dropdown").forEach(dd=>{
+ const btn=dd.querySelector("button");
+ const menu=dd.querySelector(".menu");
 
-  let texto = "";
+ const options={
+  ano:["2024","2025"],
+  mes:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
+  semana:["Semana 1","Semana 2","Semana 3","Semana 4","Semana 5"]
+ }[dd.dataset.type];
 
-  if (semana === "Visão Geral") {
-    texto = `${ano} • ${mes}`;
-  } else {
-    texto = `${ano} • ${mes} • ${semana}`;
-  }
+ menu.innerHTML=options.map(o=>`<div>${o}</div>`).join("");
 
-  document.getElementById("subtitle").innerText = texto;
-}
+ btn.onclick=()=>{
+  document.querySelectorAll(".menu").forEach(m=>m.classList.remove("open"));
+  menu.classList.toggle("open");
+ };
 
-document.querySelectorAll("select").forEach(el => {
-  el.addEventListener("change", atualizarSubtitulo);
+ menu.querySelectorAll("div").forEach(opt=>{
+  opt.onclick=()=>{
+   btn.textContent=opt.textContent;
+   menu.classList.remove("open");
+   atualizarSubtitle();
+  };
+ });
 });
 
-atualizarSubtitulo();
-</script>
+document.addEventListener("click",e=>{
+ if(!e.target.closest(".dropdown")){
+  document.querySelectorAll(".menu").forEach(m=>m.classList.remove("open"));
+ }
+});
 
+function atualizarSubtitle(){
+ const anos=document.querySelector('[data-type="ano"] button').textContent;
+ const mes=document.querySelector('[data-type="mes"] button').textContent;
+ const semana=document.querySelector('[data-type="semana"] button').textContent;
+ subtitle.textContent=`${anos} • ${mes} • ${semana}`;
+}
+</script>
 </body>
 </html>
