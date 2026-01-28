@@ -123,6 +123,32 @@ body{
  gap:12px;
  margin-bottom:24px;
  flex-wrap:wrap;
+ align-items:center;
+}
+
+.mode-toggle{
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ color:white;
+ border:none;
+ border-radius:14px;
+ padding:12px 20px;
+ font-size:15px;
+ font-weight:700;
+ cursor:pointer;
+ transition:all 0.3s ease;
+ display:flex;
+ align-items:center;
+ gap:8px;
+ box-shadow:0 4px 12px rgba(102,126,234,0.3);
+}
+
+.mode-toggle:hover{
+ transform:translateY(-2px);
+ box-shadow:0 6px 20px rgba(102,126,234,0.5);
+}
+
+.mode-toggle.basic{
+ background:linear-gradient(135deg,#3b82f6,#2563eb);
 }
 
 select{
@@ -158,27 +184,99 @@ select:focus{
 .kpi{
  background:linear-gradient(180deg,#050b1a,#030818);
  border:1px solid var(--border);
- border-radius:18px;
- padding:18px;
+ border-radius:16px;
+ padding:18px 20px;
  transition:transform 0.2s ease,box-shadow 0.2s ease;
+ min-height:95px;
+ display:flex;
+ flex-direction:column;
+ justify-content:space-between;
 }
 
 .kpi:hover{
  transform:translateY(-2px);
- box-shadow:0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Sombras neon específicas para cada card */
+.kpi-dias {
+ box-shadow: 0 0 20px rgba(147, 197, 253, 0.15);
+}
+
+.kpi-dias:hover {
+ box-shadow: 0 4px 30px rgba(147, 197, 253, 0.3);
+}
+
+.kpi-trades {
+ box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+.kpi-trades:hover {
+ box-shadow: 0 4px 30px rgba(168, 85, 247, 0.3);
+}
+
+.kpi-pontos {
+ box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.kpi-pontos:hover {
+ box-shadow: 0 4px 30px rgba(34, 197, 94, 0.3);
+}
+
+.kpi-acc {
+ box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+}
+
+.kpi-acc:hover {
+ box-shadow: 0 4px 30px rgba(251, 191, 36, 0.3);
+}
+
+.kpi-gains {
+ box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.kpi-gains:hover {
+ box-shadow: 0 4px 30px rgba(34, 197, 94, 0.3);
+}
+
+.kpi-stops {
+ box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.kpi-stops:hover {
+ box-shadow: 0 4px 30px rgba(239, 68, 68, 0.3);
+}
+
+.kpi-zero {
+ box-shadow: 0 0 20px rgba(250, 204, 21, 0.15);
+}
+
+.kpi-zero:hover {
+ box-shadow: 0 4px 30px rgba(250, 204, 21, 0.3);
+}
+
+.kpi-dolar {
+ box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.kpi-dolar:hover {
+ box-shadow: 0 4px 30px rgba(16, 185, 129, 0.3);
 }
 
 .kpi span{
+ display:block;
  color:var(--muted);
- font-size:13px;
+ font-size:11px;
  text-transform:uppercase;
- letter-spacing:0.5px;
+ letter-spacing:1.5px;
+ font-weight:600;
 }
 
 .kpi strong{
  display:block;
+ font-size:32px;
+ font-weight:700;
+ line-height:1;
  margin-top:8px;
- font-size:28px;
 }
 
 /* GRÁFICOS */
@@ -217,6 +315,24 @@ canvas{
 }
 
 /* TABELA */
+.table-card {
+ background:linear-gradient(180deg,#050b1a,#030818);
+ border:1px solid var(--border);
+ border-radius:22px;
+ padding:18px;
+ display:flex;
+ flex-direction:column;
+ height: auto !important;
+ min-height: auto !important;
+ margin-bottom: 40px;
+}
+
+.table-card strong {
+ margin-bottom:12px;
+ font-size:18px;
+ color:var(--blue);
+}
+
 .table-wrap{ 
  overflow-x:auto;
  margin-top:16px;
@@ -370,6 +486,14 @@ tbody tr:hover{
 }
 
 /* RESPONSIVIDADE */
+.pro-only {
+ transition: opacity 0.3s ease;
+}
+
+body.basic-mode .pro-only {
+ display: none !important;
+}
+
 @media (max-width: 1024px) {
  .cards {
   grid-template-columns: 1fr;
@@ -392,7 +516,7 @@ tbody tr:hover{
  .day {
   min-height: 65px;
   padding: 4px;
-  padding-bottom: 20px;
+  padding-bottom: 22px;
   border-radius: 6px;
  }
  
@@ -410,9 +534,13 @@ tbody tr:hover{
  }
  
  .day-badge {
-  font-size: 7px;
-  padding: 2px 4px;
+  font-size: 8px;
+  padding: 2px 5px;
   bottom: 3px;
+  max-width: 90%;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.1;
  }
  
  select {
@@ -453,18 +581,39 @@ tbody tr:hover{
  <select id="filtroAno" aria-label="Selecionar ano"></select>
  <select id="filtroMes" aria-label="Selecionar mês"></select>
  <select id="filtroSemana" aria-label="Selecionar semana"></select>
+ <button id="toggleMode" class="mode-toggle">
+  <span id="modeIcon">⚡</span>
+  <span id="modeText">Modo PRO</span>
+ </button>
 </div>
 
 <div class="kpis">
- <div class="kpi"><span>Trades</span><strong id="kTrades">0</strong></div>
- <div class="kpi"><span>Pontos</span><strong id="kPontos">0</strong></div>
- <div class="kpi"><span>Gains</span><strong id="kGains" style="color:var(--green)">0</strong></div>
- <div class="kpi"><span>Stops</span><strong id="kStops" style="color:var(--red)">0</strong></div>
- <div class="kpi"><span>0x0</span><strong id="kZero" style="color:var(--yellow)">0</strong></div>
- <div class="kpi"><span>Assertividade</span><strong id="kAcc">0%</strong></div>
+ <div class="kpi kpi-dias"><span>Dias Operados</span><strong id="kDias">0</strong></div>
+ <div class="kpi kpi-trades"><span>Trades</span><strong id="kTrades">0</strong></div>
+ <div class="kpi kpi-pontos"><span>Pontos</span><strong id="kPontos">0</strong></div>
+ <div class="kpi kpi-acc"><span>Assertividade</span><strong id="kAcc">0%</strong></div>
+ <div class="kpi kpi-gains pro-only"><span>Gains</span><strong id="kGains" style="color:var(--green)">0</strong></div>
+ <div class="kpi kpi-stops pro-only"><span>Stops</span><strong id="kStops" style="color:var(--red)">0</strong></div>
+ <div class="kpi kpi-zero pro-only"><span>0x0</span><strong id="kZero" style="color:var(--yellow)">0</strong></div>
+ <div class="kpi pro-only">
+  <span>Contratos</span>
+  <input type="number" id="contratos" value="0" min="0" style="
+   background:var(--bg);
+   color:var(--text);
+   border:1px solid var(--border);
+   border-radius:8px;
+   padding:8px;
+   font-size:24px;
+   font-weight:800;
+   width:100%;
+   margin-top:8px;
+   text-align:center;
+  ">
+ </div>
+ <div class="kpi kpi-dolar pro-only"><span>Total em Dólar</span><strong id="kDolar" style="color:var(--green)">$0.00</strong></div>
 </div>
 
-<div class="cards">
+<div class="cards pro-only">
  <div class="card">
   <strong>📈 Evolução Acumulada de Pontos</strong>
   <div class="chart-wrap"><canvas id="chartAcumulado"></canvas></div>
@@ -476,7 +625,7 @@ tbody tr:hover{
 </div>
 
 <!-- CALENDÁRIO -->
-<div class="calendar-wrapper">
+<div class="calendar-wrapper pro-only">
  <strong>📅 Calendário Operacional</strong>
  <div class="calendar-header">
   <div>Dom</div><div>Seg</div><div>Ter</div>
@@ -485,7 +634,7 @@ tbody tr:hover{
  <div class="calendar-grid" id="calendar"></div>
 </div>
 
-<div class="card" style="height:auto;margin-bottom:28px">
+<div class="card table-card">
  <strong>📋 Tabela Operacional</strong>
  <div class="table-wrap">
   <table>
@@ -551,6 +700,7 @@ const Dashboard = {
   */
  async init() {
   this.cacheElementos();
+  this.inicializarToggleMode();
   await this.carregarDados();
  },
 
@@ -669,6 +819,52 @@ const Dashboard = {
    .filter(Boolean); // Remove entradas inválidas
 
   this.inicializarFiltros();
+  this.inicializarCalculadora();
+ },
+
+ /**
+  * Inicializa listeners para calculadora de moeda
+  */
+ inicializarCalculadora() {
+  const inputContratos = document.getElementById('contratos');
+  
+  if(inputContratos) {
+   inputContratos.addEventListener('input', () => this.atualizar());
+  }
+ },
+
+ /**
+  * Inicializa o toggle de modo Básico/PRO
+  */
+ inicializarToggleMode() {
+  const toggleBtn = document.getElementById('toggleMode');
+  const modeIcon = document.getElementById('modeIcon');
+  const modeText = document.getElementById('modeText');
+  let isProMode = false; // Começa em modo BÁSICO
+  
+  // Define modo básico como padrão
+  document.body.classList.add('basic-mode');
+  toggleBtn.classList.add('basic');
+  modeIcon.textContent = '📊';
+  modeText.textContent = 'Modo Básico';
+  
+  if(toggleBtn) {
+   toggleBtn.addEventListener('click', () => {
+    isProMode = !isProMode;
+    
+    if(isProMode) {
+     document.body.classList.remove('basic-mode');
+     toggleBtn.classList.remove('basic');
+     modeIcon.textContent = '⚡';
+     modeText.textContent = 'Modo PRO';
+    } else {
+     document.body.classList.add('basic-mode');
+     toggleBtn.classList.add('basic');
+     modeIcon.textContent = '📊';
+     modeText.textContent = 'Modo Básico';
+    }
+   });
+  }
  },
 
  /**
@@ -792,8 +988,25 @@ const Dashboard = {
   const operacoes = totais.gain + totais.stop;
   const assertividade = operacoes ? Math.round((totais.gain / operacoes) * 100) : 0;
 
+  // Contar dias operados (dias com pelo menos 1 trade)
+  const diasOperados = dados.filter(d => d.trades > 0).length;
+
+  // Calcular valor em dólar: Pontos × Contratos × $2
+  // Se Contratos = 0, Total = $0
+  const contratos = parseInt(document.getElementById('contratos')?.value) || 0;
+  const totalDolar = contratos === 0 ? 0 : totais.pontos * contratos * 2;
+
   document.getElementById("kTrades").textContent = totais.trades;
   document.getElementById("kPontos").textContent = totais.pontos;
+  document.getElementById("kDias").textContent = diasOperados;
+  
+  // Formatar valor em dólar
+  const kDolar = document.getElementById("kDolar");
+  if(kDolar) {
+   kDolar.textContent = totalDolar.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+   kDolar.style.color = totalDolar >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  
   document.getElementById("kGains").textContent = totais.gain;
   document.getElementById("kStops").textContent = totais.stop;
   document.getElementById("kZero").textContent = totais.zero;
