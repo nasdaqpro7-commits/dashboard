@@ -294,17 +294,17 @@ tbody tr:hover{
 .calendar-grid{
  display:grid;
  grid-template-columns:repeat(7,1fr);
- gap:12px;
+ gap:10px;
 }
 
 .day{
  position:relative;
  background:linear-gradient(180deg,#052e2b,#020617);
  border:1px solid var(--border);
- border-radius:16px;
- min-height:120px;
- padding:10px;
- padding-bottom:42px;
+ border-radius:12px;
+ min-height:100px;
+ padding:8px;
+ padding-bottom:36px;
  display:flex;
  flex-direction:column;
  transition:transform 0.2s ease,box-shadow 0.2s ease;
@@ -324,7 +324,7 @@ tbody tr:hover{
 }
 
 .day-number{
- font-size:14px;
+ font-size:13px;
  color:var(--muted);
  font-weight:600;
 }
@@ -334,15 +334,15 @@ tbody tr:hover{
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:26px;
+ font-size:32px;
  font-weight:800;
 }
 
 .day-info{
- font-size:11px;
+ font-size:13px;
  color:var(--muted);
  text-align:center;
- line-height:1.4;
+ line-height:1.5;
 }
 
 .day-badge{
@@ -356,6 +356,12 @@ tbody tr:hover{
  padding:5px 8px;
  font-size:10px;
  white-space:nowrap;
+ opacity:0;
+ transition:opacity 0.2s ease;
+}
+
+.day:hover .day-badge{
+ opacity:1;
 }
 
 .empty{
@@ -380,22 +386,33 @@ tbody tr:hover{
  }
  
  .calendar-grid {
-  gap: 6px;
+  gap: 5px;
  }
  
  .day {
-  min-height: 80px;
-  padding: 6px;
-  padding-bottom: 32px;
+  min-height: 65px;
+  padding: 4px;
+  padding-bottom: 20px;
+  border-radius: 6px;
+ }
+ 
+ .day-number {
+  font-size: 10px;
  }
  
  .day-points {
   font-size: 18px;
  }
  
+ .day-info {
+  font-size: 9px;
+  line-height: 1.2;
+ }
+ 
  .day-badge {
-  font-size: 8px;
-  padding: 3px 6px;
+  font-size: 7px;
+  padding: 2px 4px;
+  bottom: 3px;
  }
  
  select {
@@ -468,7 +485,7 @@ tbody tr:hover{
  <div class="calendar-grid" id="calendar"></div>
 </div>
 
-<div class="card" style="height:auto">
+<div class="card" style="height:auto;margin-bottom:28px">
  <strong>📋 Tabela Operacional</strong>
  <div class="table-wrap">
   <table>
@@ -1008,7 +1025,7 @@ const Dashboard = {
      </div>
      <div class="day-info">
       Trades: ${registro.trades}<br>
-      G:${registro.gain} S:${registro.stop}
+      ${registro.gain > 0 ? `Gain:${registro.gain} ` : ''}${registro.stop > 0 ? `Stop:${registro.stop} ` : ''}${registro.zero > 0 ? `0x0:${registro.zero}` : ''}
      </div>
      <div class="day-badge">${registro.semana} | ${registro.ativo}</div>
     `;
