@@ -244,8 +244,7 @@ body::before {
  align-items: center;
  justify-items: center;
  gap: 0;
- text-transform: uppercase;
- letter-spacing: 2.5px;
+ letter-spacing: 1px;
  position: relative;
  overflow: hidden;
  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
@@ -264,7 +263,7 @@ body::before {
 .mode-toggle #modeText {
  font-size: 15px;
  font-weight: 800;
- letter-spacing: 2.5px;
+ letter-spacing: 1px;
  justify-self: start;
  margin-left: 8px;
 }
@@ -633,7 +632,7 @@ canvas {
  border-radius: 12px;
  min-height: 80px;
  padding: 8px;
- padding-bottom: 28px;
+ padding-bottom: 30px;
  display: flex;
  flex-direction: column;
  justify-content: flex-start;
@@ -686,7 +685,7 @@ canvas {
 }
 
 .day-info {
- font-size: 11px;
+ font-size: 12px;
  color: var(--text-dim);
  text-align: center;
  line-height: 1.5;
@@ -1105,7 +1104,7 @@ body.basic-mode .pro-only {
  
  <button class="mode-toggle basic" id="toggleMode">
   <span id="modeIcon">📊</span>
-  <span id="modeText">MODO BÁSICO</span>
+  <span id="modeText">Modo Básico</span>
  </button>
  
  <div class="stats-sidebar">
@@ -1189,7 +1188,7 @@ body.basic-mode .pro-only {
  </div>
  
  <div class="calendar-wrapper pro-only">
-  <strong>📅 Calendário de Trading</strong>
+  <strong id="calendarTitle">📅 Calendário de Trading</strong>
   <div class="calendar-header">
    <div>Dom</div><div>Seg</div><div>Ter</div>
    <div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
@@ -1341,13 +1340,8 @@ const Dashboard = {
   filtroSemana.innerHTML = '<option value="ALL">Todas as semanas</option>' +
    semanas.map(s => `<option value="${s}">${s}</option>`).join("");
   
-  if (this.primeiraCarga) {
-   const hoje = new Date();
-   const atual = this.dados.find(d => d.data.toDateString() === hoje.toDateString());
-   filtroSemana.value = atual?.semana || "ALL";
-  } else {
-   filtroSemana.value = "ALL";
-  }
+  // Na primeira carga, sempre deixa em "Todas as semanas" para mostrar o mês completo
+  filtroSemana.value = "ALL";
   
   filtroSemana.onchange = () => {
    this.primeiraCarga = false;
@@ -1399,7 +1393,7 @@ const Dashboard = {
   toggleBtn.classList.remove('pro');
   toggleBtn.classList.add('basic');
   modeIcon.textContent = '📊';
-  modeText.textContent = 'MODO BÁSICO';
+  modeText.textContent = 'Modo Básico';
   
   if (toggleBtn) {
    toggleBtn.addEventListener('click', () => {
@@ -1410,7 +1404,7 @@ const Dashboard = {
      toggleBtn.classList.add('pro');
      toggleBtn.classList.remove('basic');
      modeIcon.textContent = '⚡';
-     modeText.textContent = 'MODO PRO';
+     modeText.textContent = 'Modo Pro';
      
      setTimeout(() => {
       this.inicializarCalculadora();
@@ -1420,7 +1414,7 @@ const Dashboard = {
      toggleBtn.classList.remove('pro');
      toggleBtn.classList.add('basic');
      modeIcon.textContent = '📊';
-     modeText.textContent = 'MODO BÁSICO';
+     modeText.textContent = 'Modo Básico';
     }
    });
   }
@@ -1719,6 +1713,14 @@ const Dashboard = {
   const mes = base.data.getMonth();
   const primeiro = new Date(ano, mes, 1);
   const ultimo = new Date(ano, mes+1, 0);
+  
+  // Atualiza o título com o nome do mês
+  const mesStr = (mes + 1).toString().padStart(2, "0");
+  const nomeMes = nomesMeses[mesStr] || "";
+  const calendarTitle = document.getElementById("calendarTitle");
+  if (calendarTitle) {
+   calendarTitle.textContent = `📅 Calendário de Trading - ${nomeMes} ${ano}`;
+  }
   
   for (let i = 0; i < primeiro.getDay(); i++) {
    grid.innerHTML += `<div class="day empty"></div>`;
