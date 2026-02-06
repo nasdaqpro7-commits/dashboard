@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard NASDAQ PRO - Premium Edition</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#050711">
+<meta name="mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -607,6 +609,43 @@ canvas {
  color: var(--text-dim);
 }
 
+#calendarTitle {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 12px;
+}
+
+#calendarTitle span {
+ flex: 1;
+ text-align: center;
+}
+
+.back-to-months-btn {
+ background: var(--blue);
+ color: white;
+ border: none;
+ border-radius: 8px;
+ padding: 8px 16px;
+ font-size: 13px;
+ font-weight: 700;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ white-space: nowrap;
+}
+
+.back-to-months-btn:hover {
+ background: var(--blue-bright);
+ transform: translateX(-3px);
+}
+
+.back-to-months-btn:active {
+ transform: translateX(-1px);
+}
+
 .calendar-header {
  display: grid;
  grid-template-columns: repeat(7, 1fr);
@@ -625,20 +664,106 @@ canvas {
  gap: 8px;
 }
 
+.calendar-grid:has(.month-card) {
+ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+ gap: 12px;
+}
+
+/* Month Cards (quando "Todos os meses" está selecionado) */
+.month-card {
+ background: linear-gradient(135deg, rgba(15,20,32,0.8), var(--card-bg));
+ border: 2px solid var(--border);
+ border-radius: 12px;
+ padding: 16px;
+ cursor: pointer;
+ transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ min-height: 100px;
+}
+
+.month-card:hover {
+ transform: translateY(-4px) scale(1.02);
+ box-shadow: var(--shadow-lg);
+ border-color: var(--blue-bright);
+}
+
+.month-card.positive {
+ background: linear-gradient(135deg, rgba(16,185,129,0.1), var(--card-bg));
+ border-color: rgba(16,185,129,0.4);
+}
+
+.month-card.positive:hover {
+ box-shadow: 0 8px 32px var(--green-glow);
+ border-color: var(--green);
+}
+
+.month-card.negative {
+ background: linear-gradient(135deg, rgba(239,68,68,0.1), var(--card-bg));
+ border-color: rgba(239,68,68,0.4);
+}
+
+.month-card.negative:hover {
+ box-shadow: 0 8px 32px var(--red-glow);
+ border-color: var(--red);
+}
+
+.month-name {
+ font-size: 14px;
+ font-weight: 800;
+ color: var(--text);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+}
+
+.month-points {
+ font-size: 32px;
+ font-weight: 900;
+ font-family: 'JetBrains Mono', monospace;
+ line-height: 1;
+}
+
+.month-info {
+ font-size: 11px;
+ color: var(--text-dim);
+ font-weight: 600;
+}
+
 .day {
  position: relative;
  background: linear-gradient(135deg, rgba(15,20,32,0.8), var(--card-bg));
  border: 1px solid var(--border);
- border-radius: 12px;
- min-height: 80px;
- padding: 8px;
- padding-bottom: 30px;
+ border-radius: 10px;
+ min-height: 75px;
+ padding: 6px;
+ padding-bottom: 26px;
  display: flex;
  flex-direction: column;
  justify-content: flex-start;
  gap: 2px;
  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ cursor: default;
+}
+
+.day.clickable {
  cursor: pointer;
+}
+
+.day.clickable::after {
+ content: '📸';
+ position: absolute;
+ top: 6px;
+ right: 6px;
+ font-size: 12px;
+ opacity: 0;
+ transition: opacity 0.3s;
+}
+
+.day.clickable:hover::after {
+ opacity: 0.7;
 }
 
 .day.positive {
@@ -667,7 +792,7 @@ canvas {
 }
 
 .day-number {
- font-size: 12px;
+ font-size: 11px;
  color: var(--muted);
  font-weight: 700;
  font-family: 'JetBrains Mono', monospace;
@@ -677,18 +802,18 @@ canvas {
  display: flex;
  align-items: center;
  justify-content: center;
- font-size: 26px;
+ font-size: 22px;
  font-weight: 900;
  font-family: 'JetBrains Mono', monospace;
- margin-top: 2px;
- margin-bottom: 6px;
+ margin-top: 1px;
+ margin-bottom: 4px;
 }
 
 .day-info {
- font-size: 12px;
+ font-size: 10px;
  color: var(--text-dim);
  text-align: center;
- line-height: 1.5;
+ line-height: 1.4;
  font-weight: 600;
 }
 
@@ -912,7 +1037,268 @@ body.basic-mode .pro-only {
  50% { box-shadow: 0 0 20px currentColor; }
 }
 
-/* ========== SCROLLBAR ========== */
+/* ========== MODAL DE FOTO DO TRADE ========== */
+.trade-photo-modal {
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: rgba(0, 0, 0, 0.95);
+ display: none;
+ align-items: center;
+ justify-content: center;
+ z-index: 10000;
+ padding: 20px;
+ backdrop-filter: blur(10px);
+ animation: fadeIn 0.3s ease-out;
+}
+
+.trade-photo-modal.active {
+ display: flex;
+}
+
+.modal-content {
+ background: var(--card-bg);
+ border: 2px solid var(--border-bright);
+ border-radius: 20px;
+ max-width: 650px;
+ width: 100%;
+ max-height: 85vh;
+ overflow-y: auto;
+ position: relative;
+ box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+ animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInUp {
+ from {
+  opacity: 0;
+  transform: translateY(50px) scale(0.9);
+ }
+ to {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+ }
+}
+
+.modal-header {
+ padding: 18px 20px;
+ border-bottom: 1px solid var(--border);
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+}
+
+.modal-header h2 {
+ font-size: 20px;
+ font-weight: 800;
+ color: var(--text);
+ display: flex;
+ align-items: center;
+ gap: 10px;
+}
+
+.modal-close-btn {
+ background: var(--red);
+ color: white;
+ border: none;
+ border-radius: 50%;
+ width: 36px;
+ height: 36px;
+ font-size: 22px;
+ font-weight: 800;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ line-height: 1;
+}
+
+.modal-close-btn:hover {
+ background: #dc2626;
+ transform: rotate(90deg) scale(1.1);
+}
+
+.modal-body {
+ padding: 20px;
+}
+
+.modal-info-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+ gap: 12px;
+ margin-bottom: 20px;
+}
+
+.modal-info-item {
+ background: rgba(99, 102, 241, 0.05);
+ border: 1px solid var(--border);
+ border-radius: 10px;
+ padding: 12px;
+ text-align: center;
+}
+
+.modal-info-item label {
+ display: block;
+ font-size: 11px;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ color: var(--text-dim);
+ margin-bottom: 6px;
+ font-weight: 700;
+}
+
+.modal-info-item .value {
+ font-size: 22px;
+ font-weight: 900;
+ font-family: 'JetBrains Mono', monospace;
+ color: var(--text);
+}
+
+.modal-info-item.positive .value {
+ color: var(--green);
+}
+
+.modal-info-item.negative .value {
+ color: var(--red);
+}
+
+.modal-photo-container {
+ background: var(--main-bg);
+ border: 2px solid var(--border);
+ border-radius: 12px;
+ padding: 12px;
+ margin-top: 20px;
+ position: relative;
+ overflow: hidden;
+ cursor: grab;
+}
+
+.modal-photo-container.grabbing {
+ cursor: grabbing;
+}
+
+.modal-photo-container img {
+ width: 100%;
+ height: auto;
+ max-height: 400px;
+ object-fit: contain;
+ border-radius: 8px;
+ display: block;
+ transition: transform 0.1s ease-out;
+ transform-origin: center center;
+}
+
+.zoom-controls {
+ position: absolute;
+ top: 16px;
+ right: 16px;
+ display: flex;
+ gap: 8px;
+ z-index: 10;
+}
+
+.zoom-btn {
+ background: rgba(0, 0, 0, 0.7);
+ color: white;
+ border: 1px solid rgba(255, 255, 255, 0.2);
+ border-radius: 8px;
+ width: 36px;
+ height: 36px;
+ font-size: 18px;
+ font-weight: 700;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ backdrop-filter: blur(10px);
+}
+
+.zoom-btn:hover {
+ background: rgba(0, 0, 0, 0.9);
+ transform: scale(1.1);
+}
+
+.zoom-btn:active {
+ transform: scale(0.95);
+}
+
+.zoom-info {
+ position: absolute;
+ bottom: 16px;
+ left: 50%;
+ transform: translateX(-50%);
+ background: rgba(0, 0, 0, 0.7);
+ color: white;
+ padding: 6px 12px;
+ border-radius: 6px;
+ font-size: 12px;
+ font-weight: 600;
+ backdrop-filter: blur(10px);
+ pointer-events: none;
+ opacity: 0;
+ transition: opacity 0.3s;
+}
+
+.zoom-info.show {
+ opacity: 1;
+}
+
+.modal-photo-loading {
+ text-align: center;
+ padding: 40px 20px;
+ color: var(--text-dim);
+ font-size: 14px;
+ font-weight: 600;
+}
+
+.modal-photo-error {
+ text-align: center;
+ padding: 40px 20px;
+ color: var(--red);
+ font-size: 14px;
+ font-weight: 600;
+}
+
+.modal-photo-spinner {
+ width: 40px;
+ height: 40px;
+ border: 3px solid var(--border);
+ border-top-color: var(--blue);
+ border-radius: 50%;
+ animation: spin 1s linear infinite;
+ margin: 0 auto 16px;
+}
+
+.currency-display {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ margin-top: 12px;
+ padding: 8px 16px;
+ background: rgba(99, 102, 241, 0.08);
+ border-radius: 8px;
+ border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.currency-icon {
+ font-size: 18px;
+ filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.currency-value-brl {
+ font-size: 15px;
+ font-weight: 800;
+ font-family: 'JetBrains Mono', monospace;
+ color: var(--text);
+ letter-spacing: 0.5px;
+}
+
+/* Remove CSS antigo do conversor */
 ::-webkit-scrollbar {
  width: 8px;
  height: 8px;
@@ -947,7 +1333,7 @@ body.basic-mode .pro-only {
   width: 100%;
   border-right: none;
   border-bottom: 1px solid var(--border);
-  padding: 24px 20px;
+  padding: 20px 16px;
  }
  
  .sidebar::before {
@@ -958,18 +1344,106 @@ body.basic-mode .pro-only {
   background: linear-gradient(90deg, transparent, var(--blue), transparent);
  }
  
+ .logo {
+  margin-bottom: 20px;
+  padding: 16px;
+ }
+ 
+ .logo img {
+  max-height: 60px;
+ }
+ 
+ .filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+ }
+ 
+ .filter-group {
+  margin-bottom: 0;
+ }
+ 
+ .filter-group label {
+  font-size: 11px;
+  margin-bottom: 6px;
+ }
+ 
+ .filter-group select {
+  padding: 10px 12px;
+  font-size: 13px;
+ }
+ 
+ .stats-sidebar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+ }
+ 
+ .sidebar-stat {
+  margin-bottom: 0;
+  padding: 10px;
+  font-size: 12px;
+ }
+ 
+ .sidebar-stat span:last-child {
+  font-size: 13px;
+ }
+ 
+ .mode-toggle {
+  padding: 14px 16px;
+  font-size: 13px;
+  margin-top: 16px;
+ }
+ 
+ .mode-toggle #modeText {
+  font-size: 13px;
+ }
+ 
+ .mode-toggle #modeIcon {
+  font-size: 16px;
+ }
+ 
  .main-content {
-  padding: 24px 20px;
+  padding: 20px 16px;
+ }
+ 
+ .header-main {
+  margin-bottom: 24px;
  }
  
  .header-main h1 {
-  font-size: 32px;
+  font-size: 28px;
+ }
+ 
+ .performance-indicator {
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
+  padding: 8px 12px;
  }
 }
 
 @media (max-width: 768px) {
  .kpis {
   grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+ }
+ 
+ .kpi {
+  min-height: 90px;
+  padding: 16px;
+ }
+ 
+ .kpi span {
+  font-size: 10px;
+  margin-bottom: 8px;
+ }
+ 
+ .kpi strong {
+  font-size: 28px;
  }
  
  .calendar-grid {
@@ -1005,33 +1479,187 @@ body.basic-mode .pro-only {
  }
  
  .chart-card {
-  height: 350px;
+  height: 300px;
+  padding: 20px;
+ }
+ 
+ .chart-card h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
  }
  
  .calendar-wrapper {
   padding: 16px;
  }
  
- .calendar-wrapper > strong {
+ .calendar-wrapper > strong,
+ #calendarTitle {
   font-size: 16px;
   margin-bottom: 16px;
+ }
+ 
+ .calendar-header {
+  font-size: 12px;
+  margin-bottom: 12px;
+ }
+ 
+ .back-to-months-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+ }
+ 
+ .month-card {
+  min-height: 90px;
+  padding: 14px;
+  gap: 6px;
+ }
+ 
+ .month-name {
+  font-size: 13px;
+ }
+ 
+ .month-points {
+  font-size: 28px;
+ }
+ 
+ .month-info {
+  font-size: 10px;
+ }
+ 
+ .table-card {
+  padding: 20px 16px;
+ }
+ 
+ .table-card > strong {
+  font-size: 16px;
+  margin-bottom: 16px;
+ }
+ 
+ table {
+  min-width: 700px;
+ }
+ 
+ th {
+  font-size: 11px;
+  padding: 12px 10px;
+ }
+ 
+ td {
+  font-size: 12px;
+  padding: 12px 10px;
+ }
+ 
+ /* Modal menor em mobile */
+ .modal-content {
+  max-width: 95%;
+  max-height: 90vh;
+ }
+ 
+ .modal-header {
+  padding: 14px 16px;
+ }
+ 
+ .modal-header h2 {
+  font-size: 16px;
+  gap: 8px;
+ }
+ 
+ .modal-close-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+ }
+ 
+ .modal-body {
+  padding: 16px;
+ }
+ 
+ .modal-info-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+ }
+ 
+ .modal-info-item {
+  padding: 10px;
+ }
+ 
+ .modal-info-item label {
+  font-size: 10px;
+  margin-bottom: 4px;
+ }
+ 
+ .modal-info-item .value {
+  font-size: 18px;
+ }
+ 
+ .modal-photo-container {
+  padding: 10px;
+  margin-top: 16px;
+ }
+ 
+ .modal-photo-container img {
+  max-height: 300px;
+ }
+ 
+ .modal-photo-loading,
+ .modal-photo-error {
+  padding: 30px 16px;
+  font-size: 13px;
+ }
+ 
+ .modal-photo-spinner {
+  width: 35px;
+  height: 35px;
+  margin-bottom: 12px;
+ }
+ 
+ .currency-display {
+  padding: 6px 12px;
+  margin-top: 10px;
+  gap: 6px;
+ }
+ 
+ .currency-icon {
+  font-size: 16px;
+ }
+ 
+ .currency-value-brl {
+  font-size: 13px;
  }
 }
 
 @media (max-width: 480px) {
  .kpis {
   grid-template-columns: 1fr;
+  gap: 10px;
+ }
+ 
+ .kpi {
+  min-height: 80px;
+  padding: 14px;
  }
  
  .header-main h1 {
-  font-size: 28px;
+  font-size: 24px;
  }
  
  .performance-indicator {
-  top: 10px;
-  right: 10px;
-  font-size: 11px;
-  padding: 8px 12px;
+  position: relative;
+  top: 0;
+  right: 0;
+  margin-bottom: 16px;
+  justify-content: flex-start;
+ }
+ 
+ .filters {
+  grid-template-columns: 1fr;
+  gap: 10px;
+ }
+ 
+ .stats-sidebar {
+  grid-template-columns: 1fr;
+  gap: 8px;
  }
  
  .day {
@@ -1042,6 +1670,58 @@ body.basic-mode .pro-only {
  
  .day-points {
   font-size: 18px;
+ }
+ 
+ .day-info {
+  font-size: 8px;
+ }
+ 
+ .calendar-header {
+  font-size: 11px;
+ }
+ 
+ .chart-card {
+  height: 250px;
+  padding: 16px;
+ }
+ 
+ .chart-card h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+ }
+ 
+ .modal-content {
+  max-width: 98%;
+  border-radius: 16px;
+ }
+ 
+ .modal-header h2 {
+  font-size: 14px;
+ }
+ 
+ .modal-info-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+ }
+ 
+ .modal-photo-container img {
+  max-height: 250px;
+ }
+ 
+ .contratos-control {
+  gap: 8px;
+ }
+ 
+ .btn-control {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+ }
+ 
+ .valor-contratos {
+  font-size: 24px;
+  padding: 6px 18px;
+  min-width: 70px;
  }
 }
 
@@ -1169,6 +1849,10 @@ body.basic-mode .pro-only {
   <div class="kpi pro-only">
    <span>Total em Dólar</span>
    <strong id="kDolar" style="color:var(--green)">$0.00</strong>
+   <div class="currency-display">
+    <span class="currency-icon">🇧🇷</span>
+    <span class="currency-value-brl" id="valorBRL">R$ 0,00</span>
+   </div>
   </div>
  </div>
  
@@ -1214,8 +1898,28 @@ body.basic-mode .pro-only {
 </div>
 </div>
 
+<!-- MODAL DE FOTO DO TRADE -->
+<div class="trade-photo-modal" id="tradePhotoModal">
+ <div class="modal-content">
+  <div class="modal-header">
+   <h2 id="modalTitle">📅 Carregando...</h2>
+   <button class="modal-close-btn" onclick="Dashboard.fecharModal()">×</button>
+  </div>
+  <div class="modal-body">
+   <div class="modal-info-grid" id="modalInfoGrid"></div>
+   <div class="modal-photo-container" id="modalPhotoContainer">
+    <div class="modal-photo-loading">
+     <div class="modal-photo-spinner"></div>
+     Carregando foto...
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTbyybCny81vfVXQHmtlkKEOHHJ6xJ_pKSG_4ndkK0tH-YocrFeWY7qL41TS1IfvRQjLSbLIILV56OV/pub?output=csv";
+const GOOGLE_DRIVE_FOLDER_ID = "13wSi9sB3nDbQcF0oYDF1ZxWtLVNNrroh";
 const nomesMeses = {
  "01":"Janeiro","02":"Fevereiro","03":"Março","04":"Abril",
  "05":"Maio","06":"Junho","07":"Julho","08":"Agosto",
@@ -1227,11 +1931,20 @@ const Dashboard = {
  primeiraCarga: true,
  chartAcumulado: null,
  chartBar: null,
+ cotacaoUSDtoBRL: 5.50,
+ valorTotalUSD: 0,
+ zoomLevel: 1,
+ zoomPosX: 0,
+ zoomPosY: 0,
+ isDragging: false,
+ startX: 0,
+ startY: 0,
  
  async init() {
   this.inicializarToggleMode();
   await this.carregarDados();
   this.atualizarPerformanceIndicator();
+  this.inicializarConversorMoeda();
  },
  
  async carregarDados() {
@@ -1269,7 +1982,8 @@ const Dashboard = {
     trades: +cols[4] || 0,
     gain: +cols[5] || 0,
     stop: +cols[6] || 0,
-    zero: +cols[7] || 0
+    zero: +cols[7] || 0,
+    fotoId: cols[8] || "" // Coluna 8: ID da foto do Google Drive
    };
   }).filter(Boolean);
   
@@ -1302,10 +2016,14 @@ const Dashboard = {
    meses.map(m => `<option value="${m}">${nomesMeses[m]}</option>`).join("");
   
   const mesAtual = (new Date().getMonth()+1).toString().padStart(2,"0");
+  
+  // Na primeira carga, seleciona o mês atual (não "Todos os meses")
   if (this.primeiraCarga && meses.includes(mesAtual)) {
    filtroMes.value = mesAtual;
-  } else {
+   filtroSemana.disabled = false;
+  } else if (!this.primeiraCarga) {
    filtroMes.value = "ALL";
+   filtroSemana.disabled = true;
   }
   
   filtroMes.onchange = () => {
@@ -1464,6 +2182,10 @@ const Dashboard = {
   if (kDolar) {
    kDolar.textContent = totalDolar.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
    kDolar.style.color = totalDolar >= 0 ? 'var(--green)' : 'var(--red)';
+   
+   // Atualiza valor em Real
+   this.valorTotalUSD = totalDolar;
+   this.atualizarValorReal();
   }
   
   const kGains = document.getElementById("kGains");
@@ -1697,44 +2419,482 @@ const Dashboard = {
   }
  },
  
+ voltarParaMeses() {
+  filtroMes.value = "ALL";
+  filtroSemana.disabled = true;
+  filtroSemana.value = "ALL";
+  this.primeiraCarga = false;
+  this.atualizar();
+ },
+ 
+ abrirModal(dadosDia) {
+  console.log('📸 Abrindo modal com dados:', dadosDia);
+  
+  const modal = document.getElementById('tradePhotoModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalInfoGrid = document.getElementById('modalInfoGrid');
+  const modalPhotoContainer = document.getElementById('modalPhotoContainer');
+  
+  if (!modal || !modalTitle || !modalInfoGrid || !modalPhotoContainer) {
+   console.error('❌ Elementos do modal não encontrados');
+   return;
+  }
+  
+  // Formata a data
+  const data = new Date(dadosDia.data);
+  const dia = data.getDate();
+  const mes = nomesMeses[dadosDia.mes];
+  const ano = dadosDia.ano;
+  
+  console.log('📅 Data formatada:', `${dia} de ${mes} de ${ano}`);
+  
+  // Atualiza título
+  modalTitle.textContent = `📅 ${dia} de ${mes} de ${ano}`;
+  
+  // Monta grid de informações
+  let infoHTML = `
+   <div class="modal-info-item ${dadosDia.pontos > 0 ? 'positive' : dadosDia.pontos < 0 ? 'negative' : ''}">
+    <label>Pontos</label>
+    <div class="value">${dadosDia.pontos > 0 ? '+' : ''}${dadosDia.pontos}</div>
+   </div>
+   <div class="modal-info-item">
+    <label>Trades</label>
+    <div class="value">${dadosDia.trades}</div>
+   </div>
+   <div class="modal-info-item positive">
+    <label>Gains</label>
+    <div class="value">${dadosDia.gain}</div>
+   </div>
+   <div class="modal-info-item negative">
+    <label>Stops</label>
+    <div class="value">${dadosDia.stop}</div>
+   </div>
+  `;
+  
+  if (dadosDia.zero > 0) {
+   infoHTML += `
+    <div class="modal-info-item">
+     <label>Breakeven</label>
+     <div class="value" style="color: var(--yellow)">${dadosDia.zero}</div>
+    </div>
+   `;
+  }
+  
+  modalInfoGrid.innerHTML = infoHTML;
+  
+  console.log('🖼️ Carregando foto. ID:', dadosDia.fotoId);
+  
+  // Carrega a foto (passa o ID da foto se existir)
+  this.carregarFotoTrade(dadosDia.dia, modalPhotoContainer, dadosDia.fotoId);
+  
+  // Mostra modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  console.log('✅ Modal aberto com sucesso');
+ },
+ 
+ fecharModal() {
+  const modal = document.getElementById('tradePhotoModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = 'auto';
+  
+  // Reset zoom
+  this.zoomLevel = 1;
+  this.zoomPosX = 0;
+  this.zoomPosY = 0;
+ },
+ 
+ async inicializarConversorMoeda() {
+  // Busca cotação atual
+  await this.atualizarCotacao();
+ },
+ 
+ async atualizarCotacao() {
+  try {
+   const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+   const data = await response.json();
+   this.cotacaoUSDtoBRL = data.rates.BRL;
+   console.log('💱 Cotação USD → BRL:', this.cotacaoUSDtoBRL.toFixed(2));
+  } catch (error) {
+   console.warn('⚠️ Erro ao buscar cotação, usando valor padrão:', this.cotacaoUSDtoBRL);
+  }
+ },
+ 
+ atualizarValorReal() {
+  const valorBRL = document.getElementById('valorBRL');
+  if (valorBRL) {
+   const valorEmReais = this.valorTotalUSD * this.cotacaoUSDtoBRL;
+   valorBRL.textContent = valorEmReais.toLocaleString('pt-BR', { 
+    style: 'currency', 
+    currency: 'BRL' 
+   });
+  }
+ },
+ 
+ inicializarZoomFoto(container, img) {
+  // Adiciona controles de zoom
+  const controls = document.createElement('div');
+  controls.className = 'zoom-controls';
+  controls.innerHTML = `
+   <button class="zoom-btn" id="zoomIn" title="Zoom In (+)">+</button>
+   <button class="zoom-btn" id="zoomOut" title="Zoom Out (-)">−</button>
+   <button class="zoom-btn" id="zoomReset" title="Reset (0)">⟲</button>
+  `;
+  container.appendChild(controls);
+  
+  // Info de zoom
+  const zoomInfo = document.createElement('div');
+  zoomInfo.className = 'zoom-info';
+  zoomInfo.textContent = '100%';
+  container.appendChild(zoomInfo);
+  
+  // Botões de zoom
+  document.getElementById('zoomIn').addEventListener('click', () => this.zoom(img, container, 0.2));
+  document.getElementById('zoomOut').addEventListener('click', () => this.zoom(img, container, -0.2));
+  document.getElementById('zoomReset').addEventListener('click', () => this.resetZoom(img, container));
+  
+  // Zoom com scroll do mouse
+  container.addEventListener('wheel', (e) => {
+   e.preventDefault();
+   const delta = e.deltaY > 0 ? -0.1 : 0.1;
+   this.zoom(img, container, delta);
+  }, { passive: false });
+  
+  // Pan (arrastar) - Mouse
+  container.addEventListener('mousedown', (e) => {
+   if (this.zoomLevel > 1) {
+    this.isDragging = true;
+    this.startX = e.clientX - this.zoomPosX;
+    this.startY = e.clientY - this.zoomPosY;
+    container.classList.add('grabbing');
+    e.preventDefault();
+   }
+  });
+  
+  container.addEventListener('mousemove', (e) => {
+   if (this.isDragging) {
+    this.zoomPosX = e.clientX - this.startX;
+    this.zoomPosY = e.clientY - this.startY;
+    this.atualizarTransform(img);
+   }
+  });
+  
+  container.addEventListener('mouseup', () => {
+   this.isDragging = false;
+   container.classList.remove('grabbing');
+  });
+  
+  container.addEventListener('mouseleave', () => {
+   this.isDragging = false;
+   container.classList.remove('grabbing');
+  });
+  
+  // Touch (mobile)
+  let lastTouchDistance = 0;
+  let lastTouchX = 0;
+  let lastTouchY = 0;
+  
+  container.addEventListener('touchstart', (e) => {
+   if (e.touches.length === 2) {
+    // Pinch zoom
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    lastTouchDistance = Math.hypot(
+     touch2.clientX - touch1.clientX,
+     touch2.clientY - touch1.clientY
+    );
+   } else if (e.touches.length === 1 && this.zoomLevel > 1) {
+    // Pan
+    this.isDragging = true;
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+    this.startX = lastTouchX - this.zoomPosX;
+    this.startY = lastTouchY - this.zoomPosY;
+    container.classList.add('grabbing');
+   }
+  });
+  
+  container.addEventListener('touchmove', (e) => {
+   if (e.touches.length === 2) {
+    // Pinch zoom
+    e.preventDefault();
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    const distance = Math.hypot(
+     touch2.clientX - touch1.clientX,
+     touch2.clientY - touch1.clientY
+    );
+    const delta = (distance - lastTouchDistance) / 100;
+    this.zoom(img, container, delta);
+    lastTouchDistance = distance;
+   } else if (e.touches.length === 1 && this.isDragging) {
+    // Pan
+    e.preventDefault();
+    this.zoomPosX = e.touches[0].clientX - this.startX;
+    this.zoomPosY = e.touches[0].clientY - this.startY;
+    this.atualizarTransform(img);
+   }
+  }, { passive: false });
+  
+  container.addEventListener('touchend', () => {
+   this.isDragging = false;
+   container.classList.remove('grabbing');
+   lastTouchDistance = 0;
+  });
+ },
+ 
+ zoom(img, container, delta) {
+  this.zoomLevel = Math.max(1, Math.min(5, this.zoomLevel + delta));
+  
+  if (this.zoomLevel === 1) {
+   this.zoomPosX = 0;
+   this.zoomPosY = 0;
+  }
+  
+  this.atualizarTransform(img);
+  this.mostrarZoomInfo(container);
+ },
+ 
+ resetZoom(img, container) {
+  this.zoomLevel = 1;
+  this.zoomPosX = 0;
+  this.zoomPosY = 0;
+  this.atualizarTransform(img);
+  this.mostrarZoomInfo(container);
+ },
+ 
+ atualizarTransform(img) {
+  img.style.transform = `scale(${this.zoomLevel}) translate(${this.zoomPosX / this.zoomLevel}px, ${this.zoomPosY / this.zoomLevel}px)`;
+ },
+ 
+ mostrarZoomInfo(container) {
+  const zoomInfo = container.querySelector('.zoom-info');
+  if (zoomInfo) {
+   zoomInfo.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+   zoomInfo.classList.add('show');
+   setTimeout(() => zoomInfo.classList.remove('show'), 1500);
+  }
+ },
+ 
+ carregarFotoTrade(dataStr, container, fotoId) {
+  const [dia, mes, ano] = dataStr.split('/');
+  const nomeArquivo = `${dia}-${mes}-${ano}`;
+  
+  console.log('====== DEBUG FOTO ======');
+  console.log('📅 Data:', dataStr);
+  console.log('📝 Nome arquivo:', nomeArquivo);
+  console.log('🆔 ID recebido:', fotoId);
+  console.log('🔍 ID tipo:', typeof fotoId);
+  console.log('📏 ID length:', fotoId ? fotoId.length : 0);
+  console.log('✂️ ID trimmed:', fotoId ? fotoId.trim() : 'VAZIO');
+  
+  container.innerHTML = `
+   <div class="modal-photo-loading">
+    <div class="modal-photo-spinner"></div>
+    Carregando foto...
+   </div>
+  `;
+  
+  // Se tiver ID da foto (da planilha), usa direto
+  if (fotoId && fotoId.trim()) {
+   const idLimpo = fotoId.trim();
+   
+   // Testa 3 URLs diferentes do Google Drive
+   const urls = [
+    `https://drive.google.com/uc?export=view&id=${idLimpo}`,
+    `https://drive.google.com/thumbnail?id=${idLimpo}&sz=w1000`,
+    `https://lh3.googleusercontent.com/d/${idLimpo}`
+   ];
+   
+   console.log('📸 Tentando URLs:');
+   urls.forEach((u, i) => console.log(`   ${i+1}. ${u}`));
+   
+   let tentativaAtual = 0;
+   
+   const tentarProximaURL = () => {
+    if (tentativaAtual >= urls.length) {
+     console.error('❌ TODAS AS URLs falharam!');
+     console.error('🔴 ID usado:', idLimpo);
+     console.error('');
+     console.error('🔧 CHECKLIST:');
+     console.error('1. Foto está compartilhada como "Qualquer pessoa com o link"?');
+     console.error('2. ID está correto?');
+     console.error('3. Arquivo existe no Drive?');
+     
+     container.innerHTML = `
+      <div class="modal-photo-error">
+       ❌ Não foi possível carregar a foto<br>
+       <small style="font-size: 11px; opacity: 0.7; margin-top: 10px; display: block; line-height: 1.5;">
+        <strong>ID testado:</strong><br>
+        <code style="background: rgba(255,0,0,0.2); padding: 2px 6px; border-radius: 4px; font-size: 10px; word-break: break-all;">${idLimpo}</code><br><br>
+        <strong>Verifique:</strong><br>
+        1️⃣ Foto está como "Qualquer pessoa com o link"<br>
+        2️⃣ ID está correto na planilha<br>
+        3️⃣ Arquivo não foi deletado<br><br>
+        <strong>Teste você mesmo:</strong><br>
+        Cole este link no navegador:<br>
+        <code style="font-size: 9px; word-break: break-all;">drive.google.com/file/d/${idLimpo}/view</code>
+       </small>
+      </div>
+     `;
+     return;
+    }
+    
+    const urlAtual = urls[tentativaAtual];
+    console.log(`🔄 Tentativa ${tentativaAtual + 1}/${urls.length}: ${urlAtual}`);
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+     console.log(`✅ SUCESSO na tentativa ${tentativaAtual + 1}!`);
+     console.log('🖼️ URL que funcionou:', urlAtual);
+     console.log('📐 Dimensões:', img.width, 'x', img.height);
+     
+     container.innerHTML = `<img src="${urlAtual}" alt="Trade do dia ${dataStr}" crossorigin="anonymous" id="zoomableImage">`;
+     
+     // Inicializa zoom após imagem estar no DOM
+     setTimeout(() => {
+      const imgElement = document.getElementById('zoomableImage');
+      if (imgElement) {
+       Dashboard.resetZoom(imgElement, container);
+       Dashboard.inicializarZoomFoto(container, imgElement);
+      }
+     }, 100);
+    };
+    
+    img.onerror = () => {
+     console.warn(`⚠️ Falha na tentativa ${tentativaAtual + 1}`);
+     tentativaAtual++;
+     tentarProximaURL();
+    };
+    
+    img.src = urlAtual;
+   };
+   
+   tentarProximaURL();
+   
+  } else {
+   console.warn('⚠️ NENHUM ID FORNECIDO');
+   console.warn('Verifique se a coluna FOTO_ID tem valor na planilha');
+   
+   container.innerHTML = `
+    <div class="modal-photo-error">
+     📷 Nenhuma foto configurada<br>
+     <small style="font-size: 11px; opacity: 0.8; margin-top: 10px; display: block;">
+      O ID da foto não está na planilha.<br><br>
+      <strong>Como adicionar:</strong><br>
+      1. Coluna <strong>FOTO_ID</strong> (coluna I)<br>
+      2. Cole o ID da foto do Google Drive<br>
+      3. Menu: <strong>📸 Fotos → Sincronizar</strong>
+     </small>
+    </div>
+   `;
+  }
+  
+  console.log('========================');
+ },
+ 
  renderizarCalendario(dados) {
   const grid = document.getElementById("calendar");
+  const calendarTitle = document.getElementById("calendarTitle");
+  
   if (!grid) return;
   
   grid.innerHTML = "";
+  
+  // Se estiver em "Todos os meses", mostra seletor de meses
+  if (filtroMes.value === "ALL") {
+   if (calendarTitle) {
+    calendarTitle.textContent = `📅 Selecione um Mês`;
+   }
+   
+   // Pega todos os meses disponíveis para o ano selecionado
+   const mesesDisponiveis = [...new Set(
+    this.dados
+     .filter(d => d.ano === filtroAno.value)
+     .map(d => d.mes)
+   )].sort();
+   
+   // Cria cards clicáveis para cada mês
+   mesesDisponiveis.forEach(mesNum => {
+    const nomeMes = nomesMeses[mesNum];
+    const dadosDoMes = this.dados.filter(d => d.ano === filtroAno.value && d.mes === mesNum);
+    const totalPontos = dadosDoMes.reduce((acc, d) => acc + d.pontos, 0);
+    const diasOperados = dadosDoMes.filter(d => d.trades > 0).length;
+    
+    const mesCard = document.createElement('div');
+    mesCard.className = 'month-card';
+    if (totalPontos > 0) mesCard.classList.add('positive');
+    if (totalPontos < 0) mesCard.classList.add('negative');
+    
+    mesCard.innerHTML = `
+     <div class="month-name">${nomeMes}</div>
+     <div class="month-points" style="color:${totalPontos<0?'var(--red)':totalPontos>0?'var(--green)':'var(--muted)'}">
+      ${totalPontos > 0 ? '+' : ''}${totalPontos}
+     </div>
+     <div class="month-info">${diasOperados} dia${diasOperados !== 1 ? 's' : ''}</div>
+    `;
+    
+    mesCard.onclick = () => {
+     filtroMes.value = mesNum;
+     this.primeiraCarga = false;
+     filtroSemana.disabled = false;
+     this.inicializarSemanas();
+     this.atualizar();
+    };
+    
+    grid.appendChild(mesCard);
+   });
+   
+   return;
+  }
+  
+  // Se um mês específico está selecionado, mostra o calendário normal
   if (!dados.length) return;
   
-  let base = dados[0];
-  if (filtroMes.value !== "ALL") {
-   base = dados.find(d => d.mes === filtroMes.value) || dados[0];
-  }
+  let base = dados.find(d => d.mes === filtroMes.value) || dados[0];
   
   const ano = base.data.getFullYear();
   const mes = base.data.getMonth();
   const primeiro = new Date(ano, mes, 1);
   const ultimo = new Date(ano, mes+1, 0);
   
-  // Atualiza o título com o nome do mês
+  // Atualiza o título com o nome do mês e botão de voltar
   const mesStr = (mes + 1).toString().padStart(2, "0");
   const nomeMes = nomesMeses[mesStr] || "";
-  const calendarTitle = document.getElementById("calendarTitle");
   if (calendarTitle) {
-   calendarTitle.textContent = `📅 Calendário de Trading - ${nomeMes} ${ano}`;
+   calendarTitle.innerHTML = `
+    <button class="back-to-months-btn" onclick="Dashboard.voltarParaMeses()" title="Voltar para seleção de meses">
+     ← Voltar
+    </button>
+    <span>📅 ${nomeMes} ${ano}</span>
+    <div></div>
+   `;
   }
   
   for (let i = 0; i < primeiro.getDay(); i++) {
-   grid.innerHTML += `<div class="day empty"></div>`;
+   const emptyDay = document.createElement('div');
+   emptyDay.className = 'day empty';
+   grid.appendChild(emptyDay);
   }
   
   for (let d = 1; d <= ultimo.getDate(); d++) {
    const data = new Date(ano, mes, d);
    const r = dados.find(x => x.data.toDateString() === data.toDateString());
-   let cls = "day", pts = "", info = "", badge = "";
+   
+   const dayDiv = document.createElement('div');
+   dayDiv.className = 'day';
+   
+   let pts = "";
+   let info = "";
+   let badge = "";
    
    if (r) {
     pts = r.pontos;
-    if (pts > 0) cls += " positive";
-    if (pts < 0) cls += " negative";
+    if (pts > 0) dayDiv.classList.add('positive');
+    if (pts < 0) dayDiv.classList.add('negative');
     
     let primeiraLinha = `${r.trades} trade${r.trades !== 1 ? 's' : ''}`;
     
@@ -1750,25 +2910,51 @@ const Dashboard = {
     }
     
     badge = `<div class="day-badge">${r.semana} • ${r.ativo}</div>`;
+    
+    // Adiciona evento de clique apenas se houver trades E foto
+    if (r.trades > 0 && r.fotoId && r.fotoId.toString().trim() !== '') {
+     dayDiv.classList.add('clickable');
+     dayDiv.style.cursor = 'pointer';
+     
+     // Adiciona evento de clique
+     dayDiv.addEventListener('click', () => {
+      Dashboard.abrirModal(r);
+     });
+    }
    }
    
-   grid.innerHTML += `
-    <div class="${cls}">
-     <div class="day-number">${d}</div>
-     <div class="day-points"
-      style="color:${pts<0?'var(--red)':pts>0?'var(--green)':'var(--muted)'}">
-      ${r && r.trades > 0 ? (pts === 0 ? '0' : pts) : (pts || "")}
-     </div>
-     <div class="day-info">${info}</div>
-     ${badge}
-    </div>`;
+   // Monta o HTML interno
+   const ptsDisplay = r && r.trades > 0 ? (pts === 0 ? '0' : pts) : (pts || "");
+   const ptsColor = pts < 0 ? 'var(--red)' : pts > 0 ? 'var(--green)' : 'var(--muted)';
+   
+   dayDiv.innerHTML = `
+    <div class="day-number">${d}</div>
+    <div class="day-points" style="color:${ptsColor}">
+     ${ptsDisplay}
+    </div>
+    <div class="day-info">${info}</div>
+    ${badge}
+   `;
+   
+   grid.appendChild(dayDiv);
   }
  }
 };
 
 Dashboard.init();
 
+// Fechar modal ao clicar fora
+document.getElementById('tradePhotoModal')?.addEventListener('click', (e) => {
+ if (e.target.id === 'tradePhotoModal') {
+  Dashboard.fecharModal();
+ }
+});
+
+// Fechar modal com ESC e alternar modo com Ctrl+M
 document.addEventListener('keydown', (e) => {
+ if (e.key === 'Escape') {
+  Dashboard.fecharModal();
+ }
  if (e.ctrlKey && e.key === 'm') {
   e.preventDefault();
   document.getElementById('toggleMode')?.click();
