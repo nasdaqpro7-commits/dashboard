@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#050711">
 <meta name="mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1247,6 +1248,137 @@ body.basic-mode .pro-only {
  opacity: 1;
 }
 
+.download-btn {
+ position: absolute;
+ top: 16px;
+ left: 16px;
+ background: var(--green);
+ color: white;
+ border: none;
+ border-radius: 8px;
+ padding: 10px 16px;
+ font-size: 14px;
+ font-weight: 700;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ z-index: 10;
+ backdrop-filter: blur(10px);
+ box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.download-btn:hover {
+ background: #10b981;
+ transform: translateY(-2px);
+ box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.download-btn:active {
+ transform: translateY(0);
+}
+
+.download-btn.downloading {
+ background: var(--blue);
+ pointer-events: none;
+}
+
+/* Card de captura (invisível, usado apenas para screenshot) */
+.capture-card {
+ position: fixed;
+ top: -10000px;
+ left: -10000px;
+ background: linear-gradient(135deg, #0f1420 0%, #1a1f35 100%);
+ border: 2px solid rgba(99, 102, 241, 0.3);
+ border-radius: 20px;
+ padding: 24px;
+ width: 900px;
+ box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.capture-header {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ margin-bottom: 20px;
+ padding-bottom: 16px;
+ border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.capture-header-icon {
+ font-size: 28px;
+}
+
+.capture-header-title {
+ font-size: 22px;
+ font-weight: 800;
+ color: #e2e8f0;
+ font-family: 'Archivo', sans-serif;
+}
+
+.capture-stats {
+ display: grid;
+ grid-template-columns: repeat(5, 1fr);
+ gap: 12px;
+ margin-bottom: 20px;
+}
+
+.capture-stat {
+ background: rgba(99, 102, 241, 0.08);
+ border: 1px solid rgba(99, 102, 241, 0.15);
+ border-radius: 12px;
+ padding: 14px;
+ text-align: center;
+}
+
+.capture-stat-label {
+ font-size: 11px;
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ color: #94a3b8;
+ margin-bottom: 8px;
+ font-weight: 700;
+}
+
+.capture-stat-value {
+ font-size: 24px;
+ font-weight: 900;
+ font-family: 'JetBrains Mono', monospace;
+ color: #e2e8f0;
+}
+
+.capture-photo {
+ border-radius: 12px;
+ overflow: hidden;
+ border: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.capture-photo img {
+ width: 100%;
+ height: auto;
+ display: block;
+}
+
+.capture-footer {
+ margin-top: 16px;
+ padding-top: 16px;
+ border-top: 2px solid rgba(99, 102, 241, 0.2);
+ text-align: center;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ min-height: 60px;
+}
+
+.capture-footer img {
+ max-height: 50px;
+ max-width: 300px;
+ height: auto;
+ width: auto;
+ filter: brightness(1.1);
+}
+
 .modal-photo-loading {
  text-align: center;
  padding: 40px 20px;
@@ -1917,6 +2049,19 @@ body.basic-mode .pro-only {
  </div>
 </div>
 
+<!-- CARD INVISÍVEL PARA CAPTURA -->
+<div class="capture-card" id="captureCard">
+ <div class="capture-header">
+  <span class="capture-header-icon" id="captureIcon">📅</span>
+  <span class="capture-header-title" id="captureTitle">Carregando...</span>
+ </div>
+ <div class="capture-stats" id="captureStats"></div>
+ <div class="capture-photo" id="capturePhoto"></div>
+ <div class="capture-footer" id="captureFooter">
+  <img src="logo.png" alt="Mentoria NasdaqPro" onerror="this.parentElement.innerHTML='<span style=\'color:#64748b;font-size:12px;font-weight:600\'>NASDAQ PRO Trading Dashboard</span>'">
+ </div>
+</div>
+
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTbyybCny81vfVXQHmtlkKEOHHJ6xJ_pKSG_4ndkK0tH-YocrFeWY7qL41TS1IfvRQjLSbLIILV56OV/pub?output=csv";
 const GOOGLE_DRIVE_FOLDER_ID = "13wSi9sB3nDbQcF0oYDF1ZxWtLVNNrroh";
@@ -1939,6 +2084,7 @@ const Dashboard = {
  isDragging: false,
  startX: 0,
  startY: 0,
+ tradeAtual: null,
  
  async init() {
   this.inicializarToggleMode();
@@ -2430,6 +2576,9 @@ const Dashboard = {
  abrirModal(dadosDia) {
   console.log('📸 Abrindo modal com dados:', dadosDia);
   
+  // Salva trade atual para download
+  this.tradeAtual = dadosDia;
+  
   const modal = document.getElementById('tradePhotoModal');
   const modalTitle = document.getElementById('modalTitle');
   const modalInfoGrid = document.getElementById('modalInfoGrid');
@@ -2533,6 +2682,13 @@ const Dashboard = {
  },
  
  inicializarZoomFoto(container, img) {
+  // Adiciona botão de download
+  const downloadBtn = document.createElement('button');
+  downloadBtn.className = 'download-btn';
+  downloadBtn.innerHTML = '<span>📥</span><span>Baixar Foto</span>';
+  downloadBtn.onclick = () => this.baixarFoto();
+  container.appendChild(downloadBtn);
+  
   // Adiciona controles de zoom
   const controls = document.createElement('div');
   controls.className = 'zoom-controls';
@@ -2674,6 +2830,115 @@ const Dashboard = {
    zoomInfo.textContent = `${Math.round(this.zoomLevel * 100)}%`;
    zoomInfo.classList.add('show');
    setTimeout(() => zoomInfo.classList.remove('show'), 1500);
+  }
+ },
+ 
+ async baixarFoto() {
+  if (!this.tradeAtual) {
+   alert('❌ Nenhum trade selecionado');
+   return;
+  }
+  
+  const btn = document.querySelector('.download-btn');
+  if (btn) {
+   btn.classList.add('downloading');
+   btn.innerHTML = '<span>⏳</span><span>Gerando...</span>';
+  }
+  
+  try {
+   // Preenche o card de captura
+   const data = new Date(this.tradeAtual.data);
+   const dia = data.getDate();
+   const mes = nomesMeses[this.tradeAtual.mes];
+   const ano = this.tradeAtual.ano;
+   
+   document.getElementById('captureIcon').textContent = '📅';
+   document.getElementById('captureTitle').textContent = `${dia} de ${mes} de ${ano}`;
+   
+   // Preenche stats
+   const captureStats = document.getElementById('captureStats');
+   captureStats.innerHTML = `
+    <div class="capture-stat">
+     <div class="capture-stat-label">PONTOS</div>
+     <div class="capture-stat-value" style="color:${this.tradeAtual.pontos < 0 ? '#ef4444' : this.tradeAtual.pontos > 0 ? '#10b981' : '#94a3b8'}">
+      ${this.tradeAtual.pontos > 0 ? '+' : ''}${this.tradeAtual.pontos}
+     </div>
+    </div>
+    <div class="capture-stat">
+     <div class="capture-stat-label">TRADES</div>
+     <div class="capture-stat-value">${this.tradeAtual.trades}</div>
+    </div>
+    <div class="capture-stat">
+     <div class="capture-stat-label">GAINS</div>
+     <div class="capture-stat-value" style="color:#10b981">${this.tradeAtual.gain}</div>
+    </div>
+    <div class="capture-stat">
+     <div class="capture-stat-label">STOPS</div>
+     <div class="capture-stat-value" style="color:#ef4444">${this.tradeAtual.stop}</div>
+    </div>
+    <div class="capture-stat">
+     <div class="capture-stat-label">BREAKEVEN</div>
+     <div class="capture-stat-value" style="color:#f59e0b">${this.tradeAtual.zero}</div>
+    </div>
+   `;
+   
+   // Pega a imagem do modal
+   const modalImg = document.querySelector('#modalPhotoContainer img');
+   const capturePhoto = document.getElementById('capturePhoto');
+   
+   if (modalImg) {
+    capturePhoto.innerHTML = `<img src="${modalImg.src}" crossorigin="anonymous">`;
+   } else {
+    throw new Error('Imagem não encontrada');
+   }
+   
+   // Garante que a logo está carregada
+   const captureFooter = document.getElementById('captureFooter');
+   const logoImg = captureFooter.querySelector('img');
+   
+   if (logoImg && !logoImg.complete) {
+    await new Promise((resolve, reject) => {
+     logoImg.onload = resolve;
+     logoImg.onerror = () => {
+      console.warn('⚠️ Logo não carregada, usando texto');
+      resolve(); // Continua mesmo se logo falhar
+     };
+     setTimeout(resolve, 2000); // Timeout de 2s
+    });
+   }
+   
+   // Aguarda imagem do trade carregar
+   await new Promise(resolve => setTimeout(resolve, 500));
+   
+   console.log('📸 Capturando card...');
+   
+   // Captura o card
+   const captureCard = document.getElementById('captureCard');
+   const canvas = await html2canvas(captureCard, {
+    backgroundColor: null,
+    scale: 2,
+    logging: false,
+    useCORS: true,
+    allowTaint: true
+   });
+   
+   // Download
+   const link = document.createElement('a');
+   const dataStr = this.tradeAtual.dia.replace(/\//g, '-');
+   link.download = `trade-${dataStr}.png`;
+   link.href = canvas.toDataURL('image/png');
+   link.click();
+   
+   console.log('✅ Foto baixada com sucesso!');
+   
+  } catch (error) {
+   console.error('❌ Erro ao baixar foto:', error);
+   alert('❌ Erro ao gerar imagem. Tente novamente.');
+  } finally {
+   if (btn) {
+    btn.classList.remove('downloading');
+    btn.innerHTML = '<span>📥</span><span>Baixar Foto</span>';
+   }
   }
  },
  
