@@ -933,7 +933,15 @@ const Dashboard = {
     if(!modal||!mt||!mig||!mpc)return;
     const data=new Date(dadosDia.data),dia=data.getDate(),mes=nomesMeses[dadosDia.mes],ano=dadosDia.ano;
     mt.textContent=`📅 ${dia} de ${mes} de ${ano}`;
-    let infoHTML=`<div class="modal-info-item ${dadosDia.pontos>0?'positive':dadosDia.pontos<0?'negative':''}"><label>Pontos</label><div class="value">${dadosDia.pontos>0?'+':''}${dadosDia.pontos}</div></div><div class="modal-info-item"><label>Trades</label><div class="value">${dadosDia.trades}</div></div><div class="modal-info-item positive"><label>Gains</label><div class="value">${dadosDia.gain}</div></div><div class="modal-info-item negative"><label>Stops</label><div class="value">${dadosDia.stop}</div></div>`;
+    const pN=dadosDia.pontosNasdaq||0, pD=dadosDia.pontosDow||0;
+    const hasBoth=pN!==0&&pD!==0;
+    let pontosHTML='';
+    if(hasBoth){
+      pontosHTML=`<div class="modal-info-item ${pN>0?'positive':pN<0?'negative':''}"><label>Pts NASDAQ</label><div class="value">${pN>0?'+':''}${pN}</div></div><div class="modal-info-item ${pD>0?'positive':pD<0?'negative':''}"><label>Pts DOW</label><div class="value">${pD>0?'+':''}${pD}</div></div>`;
+    } else {
+      pontosHTML=`<div class="modal-info-item ${dadosDia.pontos>0?'positive':dadosDia.pontos<0?'negative':''}"><label>Pontos</label><div class="value">${dadosDia.pontos>0?'+':''}${dadosDia.pontos}</div></div>`;
+    }
+    let infoHTML=pontosHTML+`<div class="modal-info-item"><label>Trades</label><div class="value">${dadosDia.trades}</div></div><div class="modal-info-item positive"><label>Gains</label><div class="value">${dadosDia.gain}</div></div><div class="modal-info-item negative"><label>Stops</label><div class="value">${dadosDia.stop}</div></div>`;
     if(dadosDia.zero>0)infoHTML+=`<div class="modal-info-item"><label>Breakeven</label><div class="value" style="color:var(--yellow)">${dadosDia.zero}</div></div>`;
     mig.innerHTML=infoHTML;
     this.carregarFotoTrade(dadosDia.dia,mpc,dadosDia.fotoId);
