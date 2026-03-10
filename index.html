@@ -16,7 +16,21 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="portal/firebase-config.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCABn9XHvjrFCbbeHT_0gHFaF5uGlKLUWM",
+  authDomain: "dashboard-nasdaq-pro.firebaseapp.com",
+  projectId: "dashboard-nasdaq-pro",
+  storageBucket: "dashboard-nasdaq-pro.firebasestorage.app",
+  messagingSenderId: "325405049429",
+  appId: "1:325405049429:web:a0289dc4f604fee1d20adc"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+console.log('✅ Firebase configurado e pronto para uso');
+</script>
 
 <style>
 :root {
