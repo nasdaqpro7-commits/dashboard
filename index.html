@@ -293,7 +293,14 @@ tbody tr:hover{background:rgba(99,102,241,0.08);transform:scale(1.01)}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="theme.js"></script>
+<script>
+/* anti-flash: aplica tema no <html> antes do body renderizar */
+(function(){
+  var t=localStorage.getItem('dashboard-tema')||'dark';
+  if(t==='light') document.documentElement.classList.add('light-theme');
+  else document.documentElement.classList.remove('light-theme');
+})();
+</script>
 </head>
 <body>
 
@@ -1147,5 +1154,6 @@ document.addEventListener('keydown',(e)=>{if(e.key==='Escape')Dashboard.fecharMo
 </script>
 
 
+<script src="theme.js"></script>
 </body>
 </html>
